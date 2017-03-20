@@ -8,7 +8,7 @@ using Core.Batch.Engine.Helpers;
 namespace Core.Batch.Engine.Base
 {
     /// <summary>
-    /// Clase encargada de manejar las sesiones y las operaciones contenidas en cada sesión.
+    /// Class responsible for handling the operations contained in each session.
     /// </summary>
     public sealed class Application : IApplication
     {
@@ -19,10 +19,10 @@ namespace Core.Batch.Engine.Base
         const string connectionString = "Banense.Pattern.Architecture.SessionStorage";
 
         /// <summary>
-        /// Crea una nueva instancia de <see cref="Application"/>
+        /// Create a new instance of <see cref="Application"/>
         /// </summary>
-        /// <param name="session">Sesión inyectada por dependencia.</param>
-        /// <param name="notification">El tipo de notificación que se necesite.</param>
+        /// <param name="session">Session injected by dependency.</param>
+        /// <param name="notification">The type of notification needed.</param>
         public Application(IAppSession session, INotification notification)
         {
             if(session != null)
@@ -46,7 +46,7 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Ejecuta cada una de las operaciones de la sesión.
+        /// It executes each one of the operations of the session.
         /// </summary>
         public async Task ExecuteAsync()
         {
@@ -72,7 +72,7 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Este método es invocado para recuperar una sesión que no ha finalizado correctamente.
+        /// This method is invoked to retrieve a session that has not completed successfully.
         /// </summary>
         public async Task ResumeAsync()
         {
@@ -117,9 +117,9 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Método de ayuda que se encarga de recibir la operación y de ejecutarla.
+        /// Help method that is responsible for receiving the operation and executing it.
         /// </summary>
-        /// <param name="operation">Operación a ejecutar.</param>
+        /// <param name="operation">Operation to be executed.</param>
         async Task<int> ExecuteAsync(IOperation operation)
         {
             var response = await operation.SendAsync();
@@ -127,13 +127,13 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Método de ayuda que se encarga de verificar el resultado de las operaciones.
+        /// Help method that verifies the results of operations.
         /// </summary>
-        /// <param name="operation">Operación ejecutada.</param>
-        /// <param name="response">Respuesta recibida.</param>
+        /// <param name="operation">Operation executed.</param>
+        /// <param name="response">Response received.</param>
         /// <remarks>
-        ///  1 si el estado de la operación es correcta.
-        /// -1 si el estado de la operación es incorrecta.
+        ///  1 if the operation status is correct.
+        /// -1 if the status of the operation is incorrect.
         /// </remarks>
         async Task<int> ValidateAsync(IOperation operation, OperationResponseMessage response)
         {
@@ -157,8 +157,7 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Método de ayuda que se encarga hacer los reintentos
-        /// cuando una operación es incorrecta.
+        /// Help method that is responsible for doing the retries when an operation is incorrect.
         /// </summary>
         /// <param name="operation"></param>
         /// <returns></returns>
@@ -181,9 +180,8 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Método de ayuda para cambiar el estado de la sesión a <see cref="SessionState.Completed"/>
-        /// Almacenar la sesión en el almacenamiento local 
-        /// y enviar una notificación (correo electrónico) con estado <see cref="NotificationType.Ok"/>
+        /// Help method to change session state to <see cref="SessionState.Completed"/>
+        /// Store the session in local storage and send a notification (email) with status <see cref="NotificationType.Ok"/>
         /// </summary>
         async Task CloseSessionAsOkAsync()
         {
@@ -193,9 +191,8 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Método de ayuda para cambiar el estado de la sesión a <see cref="SessionState.Uncompleted"/>
-        /// Almacenar la sesión en el almacenamiento local 
-        /// y enviar una notificación (correo electrónico) con estado <see cref="NotificationType.Failed"/>
+        /// Help method to change session state to <see cref="SessionState.Uncompleted"/>
+        /// Store the session in local storage and send a notification (email) with status <see cref="NotificationType.Failed"/>
         /// </summary>
         async Task CloseSessionAsFailedAsync()
         {

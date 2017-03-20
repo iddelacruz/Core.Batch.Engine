@@ -10,64 +10,63 @@ namespace Core.Batch.Engine.Contracts
     public interface IAppSession : IDisposable
     {
         /// <summary>
-        /// Identificador de la sesión.
+        /// Session identifier.
         /// </summary>
         Guid SessionID { get; }
 
         /// <summary>
-        /// Estado de la sesión: <see cref="SessionState"/> 
+        /// Session state: <see cref="SessionState"/> 
         /// </summary>
         SessionState State { get; set; }
 
         /// <summary>
-        /// Fecha de creación de la sesión.
+        /// Creation date of the session.
         /// </summary>
         DateTime? CreationDate { get; }
 
         /// <summary>
-        /// Fecha de actualización de la sesión.
+        /// Date of session update.
         /// </summary>
         DateTime? UpdateDate { get; }
 
         /// <summary>
-        /// Listado de las operaciones que quedan pendientes de ejecutar.
+        /// List of pending operations.
         /// </summary>
         Queue<IOperation> OperationsRemaining { get; }
 
         /// <summary>
-        /// Listado con los resultados de las operaciones realizadas.
+        /// Listing with the results of the operations performed.
         /// </summary>
         List<IOperation> OperationsResult { get; }
 
         /// <summary>
-        /// Asociación bidireccional entre <see cref="IAppSession"/>
-        /// y <see cref="IApplication"/>
+        /// Two-way association between <see cref="IAppSession"/> and <see cref="IApplication"/>
         /// </summary>
         IApplication App { get; set; }
 
 
         #region Operations
         /// <summary>
-        /// Obtener un objeto <see cref="IAppSession"/> por identififcador.
+        /// Get an object <see cref="IAppSession"/> by identifier.
         /// </summary>
-        /// <param name="identifier">Identificador de la sesión.</param>
+        /// <param name="identifier">Session identifier.</param>
         Task GetAsync(Guid identifier);
 
         /// <summary>
-        /// Agregar operaciones a la sesión.
+        /// Register operations to the session.
         /// </summary>
-        /// <param name="operation">La operación que se va a agregar.</param>
-        /// <returns>Verdadero si se ha añadido correctamente, falso si no.</returns>
+        /// <param name="operation">The operation to be added.</param>
+        /// <returns>True if added correctly, false if not.</returns>
         Task<bool> RegisterOperationAsync(IOperation operation);
 
         /// <summary>
-        /// Almacena en memoria los cambios sobre cada una de las operaciones.
+        /// Stores changes in memory to each of the operations.
         /// </summary>
-        /// <param name="operation">Operación a almacenar.</param>
+        /// <param name="operation">Operation to be stored.</param>
         Task StoreAsync(IOperation operation);
 
         /// <summary>
-        /// Encargado de persistir la sesión.
+        /// Responsible for persisting the session.
         /// </summary>
         Task FlushAsync();
         #endregion

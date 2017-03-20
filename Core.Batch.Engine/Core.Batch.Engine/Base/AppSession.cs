@@ -10,12 +10,8 @@ using System.Threading.Tasks;
 namespace Core.Batch.Engine.Base
 {
     /// <summary>
-    /// Clase encargada de contener las operaciones a manejar.
+    /// Class responsible for containing the operations to be executed.
     /// </summary>
-    /// <remarks>
-    /// Esta clase se encargará de manejar el estado de las operaciones
-    /// que se harán sobre el Servicio Web de Eurotax.
-    /// </remarks>
     public sealed class AppSession : IAppSession
     {
         #region Fields
@@ -24,45 +20,45 @@ namespace Core.Batch.Engine.Base
 
         #region Properties
         /// <summary>
-        /// Identificador de la sesión.
+        /// Session identifier.
         /// </summary>
         public Guid SessionID { get; internal set; }
 
         /// <summary>
-        /// Listado de las operaciones que quedan pendientes de ejecutar.
+        /// List of pending operations.
         /// </summary>
         public Queue<IOperation> OperationsRemaining { get; internal set; }
 
         /// <summary>
-        /// Listado con los resultados de las operaciones realizadas.
+        /// Listing with the results of the operations performed.
         /// </summary>
         public List<IOperation> OperationsResult { get; internal set; }
 
         /// <summary>
-        /// Fecha de creación de la sesión.
+        /// Creation date of the session.
         /// </summary>
         public DateTime? CreationDate { get; internal set; }
 
         /// <summary>
-        /// Fecha de actualización de la sesión.
+        /// Date of session update.
         /// </summary>
         public DateTime? UpdateDate { get; internal set; }
 
         /// <summary>
-        /// Estado de la sesión: <see cref="SessionState"/> 
+        /// Session state: <see cref="SessionState"/> 
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         public SessionState State { get; set; }
 
         /// <summary>
-        /// Asociación bidireccional entre <see cref="IAppSession"/>
-        /// y <see cref="IApplication"/>
+        /// Two-way association between <see cref="IAppSession"/> and <see cref="IApplication"/>
+        /// </summary>
         public IApplication App { get; set; }
         #endregion
 
         #region Constructors
         /// <summary>
-        /// Crea una nueva instancia de <see cref="AppSession"/>
+        /// Create a new instance of <see cref="AppSession"/>
         /// </summary>
         public AppSession()
         {
@@ -76,19 +72,19 @@ namespace Core.Batch.Engine.Base
 
         #region Operations
         /// <summary>
-        /// Obtener un objeto <see cref="IAppSession"/> por identififcador.
+        /// Get an object <see cref="IAppSession"/> by identifier.
         /// </summary>
-        /// <param name="identifier">Identificador de la sesión.</param>
+        /// <param name="identifier">Session identifier.</param>
         public async Task GetAsync(Guid identifier)
         {
             await _unitOfWork.FindAsync(identifier);
         }
 
         /// <summary>
-        /// Agregar operaciones a la sesión.
+        /// Register operations to the session.
         /// </summary>
-        /// <param name="operation">La operación que se va a agregar.</param>
-        /// <returns>Verdadero si se ha añadido correctamente, falso si no.</returns>
+        /// <param name="operation">The operation to be added.</param>
+        /// <returns>True if added correctly, false if not.</returns>
         public async Task<bool> RegisterOperationAsync(IOperation operation)
         {
             return await Task.Run(() => 
@@ -106,9 +102,9 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Almacena en memoria los cambios sobre cada una de las operaciones.
+        /// Stores changes in memory to each of the operations.
         /// </summary>
-        /// <param name="operation">Operación a almacenar.</param>
+        /// <param name="operation">Operation to be stored.</param>
         public async Task StoreAsync(IOperation operation)
         {
             await Task.Run(() => 
@@ -145,7 +141,7 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Encargado de persistir la sesión.
+        /// Responsible for persisting the session.
         /// </summary>
         public async Task FlushAsync()
         {
@@ -153,10 +149,9 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Recupera una sesión persistida que tenga el estado 
-        /// <see cref="SessionState.Uncompleted"/>
+        /// Retrieve a persistent session that has status <see cref="SessionState.Uncompleted"/>
         /// </summary>
-        /// <returns>La sesión recuperada.</returns>
+        /// <returns>The session recovered.</returns>
         public static async Task<IAppSession> RecoverAsync()
         {
             return await _unitOfWork.RecoverAsync();
