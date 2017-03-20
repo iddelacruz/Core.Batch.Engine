@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Batch.Engine", "Core.B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Batch.Engine.Test", "Core.Batch.Engine.Test\Core.Batch.Engine.Test.csproj", "{9CB918D7-5B86-469A-BEDE-4C0E368EEF66}"
 EndProject
+Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "BatchMainModel", "BatchMainModel\BatchMainModel.modelproj", "{FF76B430-BD1A-4CDB-97B0-9B4925F7F923}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{9CB918D7-5B86-469A-BEDE-4C0E368EEF66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CB918D7-5B86-469A-BEDE-4C0E368EEF66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CB918D7-5B86-469A-BEDE-4C0E368EEF66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF76B430-BD1A-4CDB-97B0-9B4925F7F923}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF76B430-BD1A-4CDB-97B0-9B4925F7F923}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF76B430-BD1A-4CDB-97B0-9B4925F7F923}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF76B430-BD1A-4CDB-97B0-9B4925F7F923}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,5 +38,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7BA038A8-2DB5-42BC-81C6-49EBC010A1E8} = {28D5F8CF-F3C9-48A0-83FF-7ECFC864EE22}
 		{9CB918D7-5B86-469A-BEDE-4C0E368EEF66} = {28D5F8CF-F3C9-48A0-83FF-7ECFC864EE22}
+		{FF76B430-BD1A-4CDB-97B0-9B4925F7F923} = {98A9BB5A-0A3E-49B1-A56F-D84B32403C4E}
 	EndGlobalSection
 EndGlobal
