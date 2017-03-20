@@ -1,9 +1,8 @@
 ﻿using Core.Batch.Engine.Helpers;
-using System;
 
 namespace Core.Batch.Engine.Base
 {
-    public class OperationResponseMessage:IDisposable
+    public struct OperationResponseMessage
     {
         public OperationStatus Status { get; set; }
 
@@ -18,11 +17,5 @@ namespace Core.Batch.Engine.Base
                 return false;
             }
         }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }
