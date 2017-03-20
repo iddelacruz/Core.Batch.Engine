@@ -16,8 +16,6 @@ namespace Core.Batch.Engine.Base
 
         INotification notification;
 
-        const string connectionString = "Banense.Pattern.Architecture.SessionStorage";
-
         /// <summary>
         /// Create a new instance of <see cref="Application"/>
         /// </summary>
@@ -63,7 +61,7 @@ namespace Core.Batch.Engine.Base
                     };
                 }
                 while (Session.OperationsRemaining.Count > 0);
-                await CloseSessionAsOkAsync();
+                await CloseSessionAndNotify(SessionState.Completed, NotificationType.Ok);
             }
             else
             {
@@ -100,7 +98,7 @@ namespace Core.Batch.Engine.Base
                             }
                             else
                             {
-                                await CloseSessionAsOkAsync();
+                                await CloseSessionAndNotify(SessionState.Completed, NotificationType.Ok);
                             }
                         }
                     }
@@ -139,7 +137,8 @@ namespace Core.Batch.Engine.Base
         {
             if (response.IsSuccessStatusCode)
             {
-                operation.Status = OperationStatus.Ok;//Esto hay que moverlo a la clase Operation si es necesario.
+                //Esto hay que moverlo a la clase Operation si es necesario.
+                operation.Status = OperationStatus.Ok;
                 await Session.StoreAsync(operation);
                 return 1;
             }
@@ -149,9 +148,10 @@ namespace Core.Batch.Engine.Base
                 {
                     return 1;
                 }
-                operation.Status = OperationStatus.Failed;//Esto hay que moverlo a la clase Operation si es necesario.
+                //Esto hay que moverlo a la clase Operation si es necesario.
+                operation.Status = OperationStatus.Failed;
                 await Session.StoreAsync(operation);
-                await CloseSessionAsFailedAsync();
+                await CloseSessionAndNotify(SessionState.Uncompleted, NotificationType.Failed);
                 return -1;
             }
         }
@@ -160,7 +160,7 @@ namespace Core.Batch.Engine.Base
         /// Help method that is responsible for doing the retries when an operation is incorrect.
         /// </summary>
         /// <param name="operation"></param>
-        /// <returns></returns>
+        /// <returns>True if the operation was executed successfully. False if not.</returns>
         async Task<bool> TryOperationAsync(IOperation operation = null)
         {
             if(operation != null)
@@ -180,25 +180,15 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Help method to change session state to <see cref="SessionState.Completed"/>
-        /// Store the session in local storage and send a notification (email) with status <see cref="NotificationType.Ok"/>
+        /// Help method to chage session state, persist data and notify.
         /// </summary>
-        async Task CloseSessionAsOkAsync()
+        /// <param name="sessionState">The current session state.</param>
+        /// <param name="notificationType">The current notification type.</param>
+        async Task CloseSessionAndNotify(SessionState sessionState, NotificationType notificationType)
         {
-            Session.State = SessionState.Completed;
+            Session.State = sessionState;
             await Session.FlushAsync();
-            await notification.NotifyAsync(NotificationType.Ok);
-        }
-
-        /// <summary>
-        /// Help method to change session state to <see cref="SessionState.Uncompleted"/>
-        /// Store the session in local storage and send a notification (email) with status <see cref="NotificationType.Failed"/>
-        /// </summary>
-        async Task CloseSessionAsFailedAsync()
-        {
-            Session.State = SessionState.Uncompleted;
-            await Session.FlushAsync();
-            await notification.NotifyAsync(NotificationType.Failed);
+            await notification.NotifyAsync(notificationType);
         }
 
         #region Dispose pattern
