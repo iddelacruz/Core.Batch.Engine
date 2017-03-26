@@ -1,40 +1,81 @@
 ﻿using Core.Batch.Engine.Contracts;
+using Core.Batch.Engine.Helpers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Core.Batch.Engine.Base
 {
     public sealed class JsonUnitOfWork : IUnitOfWork
     {
-        const string fileName = "SessionStorage.json";
+        const string fileName = "storage.json";
+        StorageCollection _storage;
 
-        static async Task<IAppSession> Init()
+        public JsonUnitOfWork()
         {
-            //TODO: Cargar el fichero de sesión si existe sino crearlo.
-            throw new NotImplementedException();
+            _storage = new StorageCollection();
+        }            
+
+        public async Task<IAppSession> FindAsync(Func<IAppSession,bool> predicate)
+        {
+            string fullPath = $"~/Storage/{fileName}";
+            string json = string.Empty;
+            IAppSession session = null;
+            if (File.Exists(fullPath))
+            {
+                StreamReader file = new StreamReader($"~/Storage/{fileName}");
+                try
+                {
+                    json = await file.ReadToEndAsync();
+                    _storage = JsonConvert.DeserializeObject<StorageCollection>(json);
+                    session = _storage.Where(predicate).FirstOrDefault();
+                    return session;
+                }
+                catch (Exception)
+                {
+                    //TODO: LOG
+                    throw;
+                }
+                finally
+                {
+                    file.Close();
+                }
+            }
+            else
+            {
+                //TODO: LOG
+                return null;
+            }
         }
 
-        public Task<IAppSession> FindAsync(Guid identifier)
+        public async Task PersistAsync(IAppSession session)
         {
-            //TODO: Buscar dentro del fichero previamente serializado la sesion por identificador.
-            throw new NotImplementedException();
+            string fullPath = $"~/Storage/{fileName}";
+            string json = string.Empty;
+            try
+            {
+                if (File.Exists(fullPath))
+                {
+                    StreamReader file = new StreamReader($"~/Storage/{fileName}");
+                    json = await file.ReadToEndAsync();
+                    _storage = JsonConvert.DeserializeObject<StorageCollection>(json);
+                }
+                _storage.Add(session);
+                File.WriteAllText(fullPath, JsonConvert.SerializeObject(_storage));
+            }
+            catch (Exception)
+            {
+                //TODO: LOG
+                throw;
+            }
+
         }
 
-        public Task PersistAsync(IAppSession result)
+        public Task<bool> RemoveAsync(IAppSession session)
         {
-            //TODO: Almacenar los datos en el fichero
-            throw new NotImplementedException();
-        }
-
-        public Task<IAppSession> RecoverAsync()
-        {
-            //TODO: Recuperar un elemento del almacenamiento local.
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RemoveAsync(Guid identifier)
-        {
-            //TODO: Eliminar sesiones del almacenamiento local.
             throw new NotImplementedException();
         }
 

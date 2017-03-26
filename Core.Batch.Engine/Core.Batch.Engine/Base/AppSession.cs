@@ -57,6 +57,12 @@ namespace Core.Batch.Engine.Base
         #endregion
 
         #region Constructors
+
+        static AppSession()
+        {
+            _unitOfWork = new JsonUnitOfWork();
+        }
+
         /// <summary>
         /// Create a new instance of <see cref="AppSession"/>
         /// </summary>
@@ -66,7 +72,6 @@ namespace Core.Batch.Engine.Base
             OperationsRemaining = new Queue<IOperation>();
             State = SessionState.Initial;
             CreationDate = DateTime.Now;
-            _unitOfWork = new JsonUnitOfWork();
         }
         #endregion
 
@@ -77,7 +82,7 @@ namespace Core.Batch.Engine.Base
         /// <param name="identifier">Session identifier.</param>
         public async Task GetAsync(Guid identifier)
         {
-            await _unitOfWork.FindAsync(identifier);
+            await _unitOfWork.FindAsync(x => x.SessionID == identifier);
         }
 
         /// <summary>
@@ -154,7 +159,7 @@ namespace Core.Batch.Engine.Base
         /// <returns>The session recovered.</returns>
         public static async Task<IAppSession> RecoverAsync()
         {
-            return await _unitOfWork.RecoverAsync();
+            return await _unitOfWork.FindAsync(x => x.State == SessionState.Uncompleted);
         }
 
         #region Dispose pattern

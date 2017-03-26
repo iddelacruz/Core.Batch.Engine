@@ -49,7 +49,7 @@ namespace Core.Batch.Engine.Contracts
         /// <summary>
         /// Get an object <see cref="IAppSession"/> by identifier.
         /// </summary>
-        /// <param name="identifier">Session identifier.</param>
+        /// <param name="predicate">A delegate predicate.</param>
         Task GetAsync(Guid identifier);
 
         /// <summary>

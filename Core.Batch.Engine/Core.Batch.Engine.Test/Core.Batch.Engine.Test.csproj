@@ -50,8 +50,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="Operations\LoadMasterData.cs" />
+    <Compile Include="Operations\LoadModels.cs" />
+    <Compile Include="Operations\LoadSpecifications.cs" />
+    <Compile Include="ApplicationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.Batch.Engine\Core.Batch.Engine.csproj">
+      <Project>{7ba038a8-2db5-42bc-81c6-49ebc010a1e8}</Project>
+      <Name>Core.Batch.Engine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

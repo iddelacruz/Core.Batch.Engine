@@ -58,6 +58,7 @@
     <Compile Include="Base\AppSession.cs" />
     <Compile Include="Helpers\DataTypes.cs" />
     <Compile Include="Helpers\InterfaceConverter.cs" />
+    <Compile Include="Helpers\StorageCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,29 +9,23 @@ namespace Core.Batch.Engine.Contracts
     public interface IUnitOfWork : IDisposable
     {
         /// <summary>
-        /// Busca un objeto <see cref="IAppSession"/> por identificador.
+        /// Find an <see cref="IAppSession"/> by predicate.
         /// </summary>
-        /// <param name="identifier">Identificador de la sesión.</param>
-        /// <returns>El objeto si lo encuentra, sino devuelve nulo.</returns>
-        Task<IAppSession> FindAsync(Guid identifier);
+        /// <param name="predicate">A predicate delegate.</param>
+        /// <returns>The <see cref="IAppSession"/> object or null.</returns>
+        Task<IAppSession> FindAsync(Func<IAppSession, bool> predicate);
 
         /// <summary>
-        /// Recupera una sesión que ha finalizado incorrectamente.
+        /// Persist the object in the file.
         /// </summary>
-        /// <returns>El objeto si lo encuentra, sino devuelve nulo.</returns>
-        Task<IAppSession> RecoverAsync();
+        /// <param name="result">The <see cref="IAppSession"/> object to persist.</param>
+        Task PersistAsync(IAppSession session);
 
         /// <summary>
-        /// Persiste el objeto sesión en local.
+        /// Delete an object from session storage.
         /// </summary>
-        /// <param name="result">Objeto <see cref="IAppSession"/> a persistir.</param>
-        Task PersistAsync(IAppSession result);
-
-        /// <summary>
-        /// Elimina un objeto sesión.
-        /// </summary>
-        /// <param name="identifier">identificador de la sesión a eliminar.</param>
-        /// <returns>Verdadero si lo ha eliminado, falso si no.</returns>
-        Task<bool> RemoveAsync(Guid identifier);
+        /// <param name="session">The session to be deleted.</param>
+        /// <returns>True if it eliminates it, false if not.</returns>
+        Task<bool> RemoveAsync(IAppSession session);
     }
 }
