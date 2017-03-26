@@ -57,7 +57,9 @@ namespace Core.Batch.Engine.Base
         #endregion
 
         #region Constructors
-
+        /// <summary>
+        /// Initialize <see cref="IUnitOfWork"/> instance.
+        /// </summary>
         static AppSession()
         {
             _unitOfWork = new JsonUnitOfWork();
