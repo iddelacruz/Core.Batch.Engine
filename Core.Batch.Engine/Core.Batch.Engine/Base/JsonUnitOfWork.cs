@@ -21,16 +21,25 @@ namespace Core.Batch.Engine.Base
 
         public async Task<IAppSession> FindAsync(Func<IAppSession,bool> predicate)
         {
-            string fullPath = $"~/Storage/{fileName}";
+            var rootPath = AppDomain.CurrentDomain.BaseDirectory;
+            string fullPath = $"{rootPath}\\{fileName}";
             string json = string.Empty;
+
             IAppSession session = null;
             if (File.Exists(fullPath))
             {
-                StreamReader file = new StreamReader($"~/Storage/{fileName}");
+                StreamReader file = new StreamReader(fullPath);
                 try
                 {
                     json = await file.ReadToEndAsync();
-                    _storage = JsonConvert.DeserializeObject<StorageCollection>(json);
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        _storage = JsonConvert.DeserializeObject<StorageCollection>(json, new JsonSerializerSettings
+                        {
+                            TypeNameHandling = TypeNameHandling.Auto,
+                            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        });
+                    }
                     session = _storage.Where(predicate).FirstOrDefault();
                     return session;
                 }
@@ -46,29 +55,44 @@ namespace Core.Batch.Engine.Base
             }
             else
             {
-                //TODO: LOG
+                //TODO: LOG WITH ANY LOG LIBRARY
                 return null;
             }
         }
 
         public async Task PersistAsync(IAppSession session)
         {
-            string fullPath = $"~/Storage/{fileName}";
             string json = string.Empty;
             try
             {
+                var rootPath = AppDomain.CurrentDomain.BaseDirectory;
+                string fullPath = $"{rootPath}\\{fileName}";
+
                 if (File.Exists(fullPath))
                 {
-                    StreamReader file = new StreamReader($"~/Storage/{fileName}");
+                    StreamReader file = new StreamReader(fullPath);
                     json = await file.ReadToEndAsync();
-                    _storage = JsonConvert.DeserializeObject<StorageCollection>(json);
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        _storage = JsonConvert.DeserializeObject<StorageCollection>(json, new JsonSerializerSettings
+                        {
+                            TypeNameHandling = TypeNameHandling.Auto,
+                            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        });
+                    }
+                    file.Close();
                 }
                 _storage.Add(session);
-                File.WriteAllText(fullPath, JsonConvert.SerializeObject(_storage));
+
+                File.WriteAllText(fullPath, JsonConvert.SerializeObject(_storage, Formatting.Indented,
+                    new JsonSerializerSettings {
+                        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        TypeNameHandling = TypeNameHandling.Auto
+                    }), System.Text.Encoding.UTF8);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO: LOG
+                //TODO: LOG WITH ANY LOG LIBRARY
                 throw;
             }
 
@@ -81,7 +105,7 @@ namespace Core.Batch.Engine.Base
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            GC.SuppressFinalize(this);
         }
     }
 }

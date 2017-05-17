@@ -8,7 +8,7 @@ using Core.Batch.Engine.Helpers;
 namespace Core.Batch.Engine.Base
 {
     /// <summary>
-    /// Class responsible for handling the operations contained in each session.
+    /// Clase responsable de manejar las operaciones que se encuentran en casa sesión.
     /// </summary>
     public sealed class Application : IApplication
     {
@@ -17,10 +17,10 @@ namespace Core.Batch.Engine.Base
         INotification notification;
 
         /// <summary>
-        /// Create a new instance of <see cref="Application"/>
+        /// Crea una nueva instancia de <see cref="Application"/>
         /// </summary>
-        /// <param name="session">Session injected by dependency.</param>
-        /// <param name="notification">The type of notification needed.</param>
+        /// <param name="session">Sesión inyectada por dependencia.</param>
+        /// <param name="notification">El tipo de notificación que utilizará.</param>
         public Application(IAppSession session, INotification notification)
         {
             if(session != null)
@@ -44,7 +44,7 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// It executes each one of the operations of the session.
+        /// Ejecuta cada una de las operaciones de la sesión.
         /// </summary>
         public async Task ExecuteAsync()
         {
@@ -70,7 +70,7 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// This method is invoked to retrieve a session that has not completed successfully.
+        /// Recupera la sesión que no ha completado correctamente y lanza la ejecución de las operaciones.
         /// </summary>
         public async Task ResumeAsync()
         {
@@ -79,6 +79,10 @@ namespace Core.Batch.Engine.Base
             if(recovered != null)
             {
                 Session = recovered;
+                if(Session.App == null)
+                {
+                    Session.App = this;
+                }
 
                 if ((Session.OperationsResult != null) && (Session.OperationsRemaining != null))
                 {
@@ -115,9 +119,9 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Help method that is responsible for receiving the operation and executing it.
+        /// Recibe una operación y la ejecuta.
         /// </summary>
-        /// <param name="operation">Operation to be executed.</param>
+        /// <param name="operation">Operación que será ejecutada.</param>
         async Task<int> ExecuteAsync(IOperation operation)
         {
             var response = await operation.SendAsync();
@@ -125,13 +129,13 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Help method that verifies the results of operations.
+        /// Verifica los resultados de las operaciones.
         /// </summary>
-        /// <param name="operation">Operation executed.</param>
-        /// <param name="response">Response received.</param>
+        /// <param name="operation">Operación ejecutada.</param>
+        /// <param name="response">Respuesta recibida al ejecutar la operación.</param>
         /// <remarks>
-        ///  1 if the operation status is correct.
-        /// -1 if the status of the operation is incorrect.
+        ///  1 Si el estado de la operación es correcto.
+        /// -1 Si el estado de la operación es incorrecto.
         /// </remarks>
         async Task<int> ValidateAsync(IOperation operation, OperationResponseMessage response)
         {
@@ -157,10 +161,10 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Help method that is responsible for doing the retries when an operation is incorrect.
+        /// Realiza los reintentos necesarios cuando el estado de la operación no es <see cref="OperationStatus.Ok"/>
         /// </summary>
-        /// <param name="operation"></param>
-        /// <returns>True if the operation was executed successfully. False if not.</returns>
+        /// <param name="operation">La operación que se intentará ejecutar.</param>
+        /// <returns>Verdadero si la operación se ejecuta correctamente, falso si no.</returns>
         async Task<bool> TryOperationAsync(IOperation operation = null)
         {
             if(operation != null)
@@ -180,10 +184,11 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Help method to chage session state, persist data and notify.
+        /// Se encarga de cambiar el estado de la sesión, persistir los datos de la sesión 
+        /// y enviar un anotificación sobre el estado del sistema.
         /// </summary>
-        /// <param name="sessionState">The current session state.</param>
-        /// <param name="notificationType">The current notification type.</param>
+        /// <param name="sessionState">El estado actual de la sesión.</param>
+        /// <param name="notificationType">Determina el tipo de notificación a enviar.</param>
         async Task CloseSessionAndNotify(SessionState sessionState, NotificationType notificationType)
         {
             Session.State = sessionState;

@@ -7,9 +7,9 @@ namespace Core.Batch.Engine.Base
 {
     public sealed class EmailNotification : INotification
     {
-        public Task NotifyAsync(NotificationType type)
+        public async Task NotifyAsync(NotificationType type)
         {
-            throw new NotImplementedException();
+            System.Diagnostics.Debug.WriteLine("Email enviado correctamente");
         }
 
         public void Dispose()

@@ -27,11 +27,13 @@ namespace Core.Batch.Engine.Base
         /// <summary>
         /// List of pending operations.
         /// </summary>
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Auto)]
         public Queue<IOperation> OperationsRemaining { get; internal set; }
 
         /// <summary>
         /// Listing with the results of the operations performed.
         /// </summary>
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Auto)]
         public List<IOperation> OperationsResult { get; internal set; }
 
         /// <summary>
@@ -53,6 +55,7 @@ namespace Core.Batch.Engine.Base
         /// <summary>
         /// Two-way association between <see cref="IAppSession"/> and <see cref="IApplication"/>
         /// </summary>
+        [JsonIgnore]
         public IApplication App { get; set; }
         #endregion
 

@@ -34,6 +34,16 @@ namespace Core.Batch.Engine.Helpers
             {
                 _helperList.Remove(item);
             }
+
+            var sessionElement = _helperList
+                .Where(x => x.State == SessionState.Uncompleted)
+                .SingleOrDefault();
+
+            if (sessionElement != null)
+            {
+                _helperList.Remove(sessionElement);
+            }
+
             _helperList.Add(item);
         }
 

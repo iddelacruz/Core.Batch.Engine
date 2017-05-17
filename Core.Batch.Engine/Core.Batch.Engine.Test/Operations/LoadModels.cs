@@ -9,9 +9,12 @@ namespace Core.Batch.Engine.Test.Operations
 {
     public class LoadModels : Operation
     {
-        public override Task<OperationResponseMessage> SendAsync()
+        public async override Task<OperationResponseMessage> SendAsync()
         {
-            throw new NotImplementedException();
+            return new OperationResponseMessage
+            {
+                Status = Helpers.OperationStatus.Failed
+            };
         }
     }
 }
