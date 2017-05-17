@@ -1,4 +1,6 @@
 ﻿using Core.Batch.Engine.Helpers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,63 +12,67 @@ namespace Core.Batch.Engine.Contracts
     public interface IAppSession : IDisposable
     {
         /// <summary>
-        /// Session identifier.
+        /// Identificador de la sesión.
         /// </summary>
         Guid SessionID { get; }
 
         /// <summary>
-        /// Session state: <see cref="SessionState"/> 
+        /// Propiedad que determina almacena el estado de la sesión.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         SessionState State { get; set; }
 
         /// <summary>
-        /// Creation date of the session.
+        /// Fecha de creación de la sesion.
         /// </summary>
         DateTime? CreationDate { get; }
 
         /// <summary>
-        /// Date of session update.
+        /// Fecha de actualización de la sesión.
         /// </summary>
         DateTime? UpdateDate { get; }
 
         /// <summary>
-        /// List of pending operations.
+        /// Listado de operaciones pendientes.
         /// </summary>
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Auto)]
         Queue<IOperation> OperationsRemaining { get; }
 
         /// <summary>
-        /// Listing with the results of the operations performed.
+        /// Lista con los resultados de las operaciones realizadas.
         /// </summary>
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Auto)]
         List<IOperation> OperationsResult { get; }
 
         /// <summary>
-        /// Two-way association between <see cref="IAppSession"/> and <see cref="IApplication"/>
+        /// Asociación bidireccional entre <see cref="IAppSession"/> y <see cref="IApplication"/>
         /// </summary>
+        [JsonIgnore]
         IApplication App { get; set; }
 
 
         #region Operations
         /// <summary>
-        /// Get an object <see cref="IAppSession"/> by identifier.
+        /// Obtiene un objeto <see cref="IAppSession"/> por su identificador.
         /// </summary>
-        /// <param name="predicate">A delegate predicate.</param>
+        /// <param name="identifier">Session identifier.</param>
         Task GetAsync(Guid identifier);
 
         /// <summary>
-        /// Register operations to the session.
+        /// Registra las operaciones en la sesión.
         /// </summary>
-        /// <param name="operation">The operation to be added.</param>
-        /// <returns>True if added correctly, false if not.</returns>
+        /// <param name="operation">Operación a registrar.</param>
+        /// <returns>Verdadero si se ha añadido correctamente, falso si no.<returns>
         Task<bool> RegisterOperationAsync(IOperation operation);
 
         /// <summary>
-        /// Stores changes in memory to each of the operations.
+        /// Almacena en memoria los cambios en cada una de las operaciones.
         /// </summary>
-        /// <param name="operation">Operation to be stored.</param>
+        /// <param name="operation">Operación a almacenar.</param>
         Task StoreAsync(IOperation operation);
 
         /// <summary>
-        /// Responsible for persisting the session.
+        /// Se encarga de persistir la sesión.
         /// </summary>
         Task FlushAsync();
         #endregion

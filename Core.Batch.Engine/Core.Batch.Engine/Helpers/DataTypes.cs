@@ -9,7 +9,8 @@ namespace Core.Batch.Engine.Helpers
     public enum NotificationType : byte
     {
         Ok,
-        Failed
+        Failed,
+        Error
     }
 
     public enum OperationStatus : byte

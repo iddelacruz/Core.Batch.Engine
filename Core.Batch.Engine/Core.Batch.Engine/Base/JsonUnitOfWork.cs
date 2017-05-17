@@ -9,16 +9,28 @@ using System.Threading.Tasks;
 
 namespace Core.Batch.Engine.Base
 {
+    /// <summary>
+    /// Unidad de trabajo que se encarga de operar con las sesiones persistidas.
+    /// </summary>
     public sealed class JsonUnitOfWork : IUnitOfWork
     {
         const string fileName = "storage.json";
+
         StorageCollection _storage;
 
+        /// <summary>
+        /// Crea una nueva instancia de <see cref="JsonUnitOfWork"/>
+        /// </summary>
         public JsonUnitOfWork()
         {
             _storage = new StorageCollection();
         }            
 
+        /// <summary>
+        /// Busca una sesión persistida.
+        /// </summary>
+        /// <param name="predicate">Predicado para buscar la sesión determinada.</param>
+        /// <returns>Un objeto <see cref="IAppSession"/> en caso de encontrarlo. Nulo si no lo encuentra.</returns>
         public async Task<IAppSession> FindAsync(Func<IAppSession,bool> predicate)
         {
             var rootPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -60,6 +72,10 @@ namespace Core.Batch.Engine.Base
             }
         }
 
+        /// <summary>
+        /// Persiste un objecto <see cref="IAppSession"/>.
+        /// </summary>
+        /// <param name="session">Objeto a persistir.</param>
         public async Task PersistAsync(IAppSession session)
         {
             string json = string.Empty;
@@ -98,6 +114,11 @@ namespace Core.Batch.Engine.Base
 
         }
 
+        /// <summary>
+        /// Elimina un elemento <see cref="IAppSession"/> previamente persistido.
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
         public Task<bool> RemoveAsync(IAppSession session)
         {
             throw new NotImplementedException();

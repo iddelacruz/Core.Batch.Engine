@@ -9,23 +9,22 @@ namespace Core.Batch.Engine.Contracts
     public interface IUnitOfWork : IDisposable
     {
         /// <summary>
-        /// Find an <see cref="IAppSession"/> by predicate.
+        /// Busca una sesión persistida.
         /// </summary>
-        /// <param name="predicate">A predicate delegate.</param>
-        /// <returns>The <see cref="IAppSession"/> object or null.</returns>
+        /// <param name="predicate">Predicado para buscar la sesión determinada.</param>
+        /// <returns>Un objeto <see cref="IAppSession"/> en caso de encontrarlo. Nulo si no lo encuentra.</returns>
         Task<IAppSession> FindAsync(Func<IAppSession, bool> predicate);
 
         /// <summary>
-        /// Persist the object in the file.
+        /// Persiste un objecto <see cref="IAppSession"/>.
         /// </summary>
-        /// <param name="result">The <see cref="IAppSession"/> object to persist.</param>
+        /// <param name="session">Objeto a persistir.</param>
         Task PersistAsync(IAppSession session);
 
         /// <summary>
-        /// Delete an object from session storage.
+        /// Elimina un elemento <see cref="IAppSession"/> previamente persistido.
         /// </summary>
-        /// <param name="session">The session to be deleted.</param>
-        /// <returns>True if it eliminates it, false if not.</returns>
+        /// <param name="session"></param>
         Task<bool> RemoveAsync(IAppSession session);
     }
 }
