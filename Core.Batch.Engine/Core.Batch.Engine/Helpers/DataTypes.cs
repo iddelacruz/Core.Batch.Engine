@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Core.Batch.Engine.Helpers
 {
+    /// <summary>
+    /// Tipo de notificación a enviar.
+    /// </summary>
     public enum NotificationType : byte
     {
         Ok,
@@ -13,6 +16,9 @@ namespace Core.Batch.Engine.Helpers
         Error
     }
 
+    /// <summary>
+    /// Estado de la operación.
+    /// </summary>
     public enum OperationStatus : byte
     {
         NotExecuted,
@@ -21,11 +27,23 @@ namespace Core.Batch.Engine.Helpers
         Failed
     }
 
+    /// <summary>
+    /// Estado de la sesión.
+    /// </summary>
     public enum SessionState : byte
     {
         Initial,
         InProgress,
         Completed,
         Uncompleted
+    }
+
+    /// <summary>
+    /// Estado de la Aplicación
+    /// </summary>
+    public enum ApplicationStatus :byte
+    {
+        Ok,
+        Retry,
     }
 }

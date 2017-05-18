@@ -21,6 +21,11 @@ namespace Core.Batch.Engine.Base
         public OperationStatus Status { get; set; } = OperationStatus.NotExecuted;
 
         /// <summary>
+        /// Asociación bidireccional entre <see cref="IOperation"/> e <see cref="IAppSession"/>
+        /// </summary>
+        public IAppSession Session { get; set; }
+
+        /// <summary>
         /// Crea una nueva instancia de <see cref="Operation"/>
         /// </summary>
         public Operation()

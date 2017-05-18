@@ -8,6 +8,8 @@ namespace Core.Batch.Engine.Contracts
 {
     public interface IApplication : IDisposable
     {
+        string Message { get; }
+
         IAppSession Session { get; }
 
         Task ExecuteAsync();

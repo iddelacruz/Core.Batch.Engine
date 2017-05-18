@@ -96,6 +96,7 @@ namespace Core.Batch.Engine.Base
                 if ((operation != null) && (!OperationsRemaining.Contains(operation)))
                 {
                     OperationsRemaining.Enqueue(operation);
+                    operation.Session = this;
                     return true;
                 }
                 else

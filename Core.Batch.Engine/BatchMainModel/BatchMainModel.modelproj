@@ -26,5 +26,6 @@
     <Content Include="ModelDefinition\BatchMainModel.uml">
       <SubType>Content</SubType>
     </Content>
+    <Folder Include="SequenceDiagrams" />
   </ItemGroup>
 </Project>

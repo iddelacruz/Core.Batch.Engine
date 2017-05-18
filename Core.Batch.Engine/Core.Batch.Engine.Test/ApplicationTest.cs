@@ -24,6 +24,10 @@ namespace Core.Batch.Engine.Test
             var notification = new EmailNotification();
             var app = new Application(session, notification);
             await app.ExecuteAsync();
+            if(app.AppStatus == Helpers.ApplicationStatus.Retry)
+            {
+                await app.ResumeAsync();
+            }
         }
     }
 }

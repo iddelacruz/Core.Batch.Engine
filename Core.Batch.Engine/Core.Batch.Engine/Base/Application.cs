@@ -12,9 +12,23 @@ namespace Core.Batch.Engine.Base
     /// </summary>
     public sealed class Application : IApplication
     {
-        public IAppSession Session { get; private set; }
-
         INotification notification;
+
+        /// <summary>
+        /// Mensaje que irá asociado al correo electrónico enviado
+        /// y a las distintas respuestas que retornarán las operaciones.
+        /// </summary>
+        public string Message { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Determina el estado completo de la aplicación.
+        /// </summary>
+        public ApplicationStatus AppStatus { get; private set; }
+
+        /// <summary>
+        /// Sesión asociada.
+        /// </summary>
+        public IAppSession Session { get; private set; }
 
         /// <summary>
         /// Crea una nueva instancia de <see cref="Application"/>
@@ -48,41 +62,34 @@ namespace Core.Batch.Engine.Base
         /// </summary>
         public async Task ExecuteAsync()
         {
-            if(Session != null)
+            Session.State = SessionState.InProgress;
+            do
             {
-                Session.State = SessionState.InProgress;
-                do
+                var operation = Session.OperationsRemaining.Dequeue();
+                var exec = await ExecuteAsync(operation);
+                if (exec == -1)
                 {
-                    var operation = Session.OperationsRemaining.Dequeue();
-                    var exec = await ExecuteAsync(operation);
-                    if (exec == -1)
-                    {
-                        return;
-                    };
-                }
-                while (Session.OperationsRemaining.Count > 0);
-                await CloseSessionAndNotify(SessionState.Completed, NotificationType.Ok);
+                    return;
+                };
             }
-            else
-            {
-                throw new NullReferenceException("Session object can not be null.");
-            }
+            while (Session.OperationsRemaining.Count > 0);
+            await CloseSessionAndNotify(SessionState.Completed, NotificationType.Ok);
         }
 
         /// <summary>
-        /// Recupera la sesión que no ha completado correctamente y lanza la ejecución de las operaciones.
+        /// Recupera la sesión que no ha completado correctamente y lanza la ejecución 
+        /// de las operaciones que han fallado <see cref="OperationStatus.Failed"/>
+        /// y las que aun no se han ejecutado <see cref="OperationStatus.NotExecuted"/>.
         /// </summary>
         public async Task ResumeAsync()
         {
             Session = null;
             var recovered = await AppSession.RecoverAsync();
+
             if(recovered != null)
             {
                 Session = recovered;
-                if(Session.App == null)
-                {
-                    Session.App = this;
-                }
+                Session.App = this;
 
                 if ((Session.OperationsResult != null) && (Session.OperationsRemaining != null))
                 {
@@ -108,13 +115,32 @@ namespace Core.Batch.Engine.Base
                     }
                     else
                     {
-                        throw new Exception("Exception: No se encontrado la operación fallida.");
+                        //TODO: LOG
+#if DEBUG
+                        System.Diagnostics.Debug.WriteLine(" No se encontrado la operación fallida.");
+#endif
+                        Message = "No se encontrado la operación fallida.";
+                        AppStatus = ApplicationStatus.Retry;
                     }
+                }
+                else
+                {
+                    //TODO: LOG
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine("No se han encontrado operaciones para ejecutar.");
+#endif
+                    Message = "No se han encontrado operaciones para ejecutar.";
+                    AppStatus = ApplicationStatus.Retry;
                 }
             }
             else
             {
-                throw new Exception("Exception: Estás intentando recuperar una sesión que no existe.");
+                //TODO: LOG
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("Estás intentando recuperar una sesión que no existe.");
+#endif
+                Message = "Estás intentando recuperar una sesión que no existe.";
+                AppStatus = ApplicationStatus.Retry;
             }
         }
 
@@ -124,8 +150,17 @@ namespace Core.Batch.Engine.Base
         /// <param name="operation">Operación que será ejecutada.</param>
         async Task<int> ExecuteAsync(IOperation operation)
         {
-            var response = await operation.SendAsync();
-            return await ValidateAsync(operation, response);
+            try
+            {
+                var response = await operation.SendAsync();
+                return await ValidateAsync(operation, response);
+            }
+            catch (Exception)
+            {
+                //TODO: Aquí hay que hacer log de las posibles excepciones.
+                throw;
+            }
+
         }
 
         /// <summary>
@@ -141,7 +176,6 @@ namespace Core.Batch.Engine.Base
         {
             if (response.IsSuccessStatusCode)
             {
-                //Esto hay que moverlo a la clase Operation si es necesario.
                 operation.Status = OperationStatus.Ok;
                 await Session.StoreAsync(operation);
                 return 1;
@@ -152,11 +186,13 @@ namespace Core.Batch.Engine.Base
                 {
                     return 1;
                 }
-                //Esto hay que moverlo a la clase Operation si es necesario.
-                operation.Status = OperationStatus.Failed;
-                await Session.StoreAsync(operation);
-                await CloseSessionAndNotify(SessionState.Uncompleted, NotificationType.Failed);
-                return -1;
+                else
+                {
+                    operation.Status = OperationStatus.Failed;
+                    await Session.StoreAsync(operation);
+                    await CloseSessionAndNotify(SessionState.Uncompleted, NotificationType.Failed);
+                    return -1;
+                }
             }
         }
 
@@ -171,13 +207,21 @@ namespace Core.Batch.Engine.Base
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    var result = await operation.SendAsync();
-                    if (result.IsSuccessStatusCode)
+                    try
                     {
-                        await ValidateAsync(operation, result);
-                        return true;
+                        var result = await operation.SendAsync();
+                        if (result.IsSuccessStatusCode)
+                        {
+                            await ValidateAsync(operation, result);
+                            return true;
+                        }
+                        Thread.Sleep(1000);
                     }
-                    Thread.Sleep(1000);
+                    catch (Exception)
+                    {
+                        //TODO: LOG.
+                        throw;
+                    }
                 }
             }
             return false;
@@ -191,6 +235,15 @@ namespace Core.Batch.Engine.Base
         /// <param name="notificationType">Determina el tipo de notificación a enviar.</param>
         async Task CloseSessionAndNotify(SessionState sessionState, NotificationType notificationType)
         {
+            if(sessionState == SessionState.Uncompleted)
+            {
+                AppStatus = ApplicationStatus.Retry;
+            }
+            else
+            {
+                AppStatus = ApplicationStatus.Ok;
+            }
+
             Session.State = sessionState;
             await Session.FlushAsync();
             await notification.NotifyAsync(notificationType);
