@@ -215,7 +215,7 @@ namespace Core.Batch.Engine.Base
                             await ValidateAsync(operation, result);
                             return true;
                         }
-                        Thread.Sleep(1000);
+                        await Task.Delay(1000);
                     }
                     catch (Exception)
                     {

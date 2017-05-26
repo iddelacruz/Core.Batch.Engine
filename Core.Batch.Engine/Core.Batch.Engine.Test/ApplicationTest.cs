@@ -21,7 +21,7 @@ namespace Core.Batch.Engine.Test
             await session.RegisterOperationAsync(masterOp);
             await session.RegisterOperationAsync(loadModelOp);
             await session.RegisterOperationAsync(loadSpecOp);
-            var notification = new EmailNotification();
+            var notification = new EmailNotification(null);
             var app = new Application(session, notification);
             await app.ExecuteAsync();
             if(app.AppStatus == Helpers.ApplicationStatus.Retry)

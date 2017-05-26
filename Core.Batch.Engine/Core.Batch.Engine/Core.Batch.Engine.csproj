@@ -50,6 +50,10 @@
   <ItemGroup>
     <Compile Include="Contracts\IApplication.cs" />
     <Compile Include="Contracts\IAppSession.cs" />
+    <Compile Include="Contracts\Email\IEmailBody.cs" />
+    <Compile Include="Contracts\Email\IEmailContent.cs" />
+    <Compile Include="Contracts\Email\IEmailHeader.cs" />
+    <Compile Include="Contracts\Email\IEmailService.cs" />
     <Compile Include="Contracts\INotification.cs" />
     <Compile Include="Contracts\IOperation.cs" />
     <Compile Include="Contracts\ISignal.cs" />
@@ -68,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
