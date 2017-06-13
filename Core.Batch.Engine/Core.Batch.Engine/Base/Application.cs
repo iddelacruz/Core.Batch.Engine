@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Core.Batch.Engine.Contracts;
 using Core.Batch.Engine.Helpers;
+using Toyota.Email.Library.Contracts;
 
 namespace Core.Batch.Engine.Base
 {
     /// <summary>
     /// Clase responsable de manejar las operaciones que se encuentran en casa sesión.
     /// </summary>
-    public sealed class Application : IApplication
+    public sealed class Application
     {
-        INotification notification;
+        IEmailSender sender;
 
         /// <summary>
         /// Mensaje que irá asociado al correo electrónico enviado
@@ -23,38 +23,27 @@ namespace Core.Batch.Engine.Base
         /// <summary>
         /// Determina el estado completo de la aplicación.
         /// </summary>
-        public ApplicationStatus AppStatus { get; private set; }
+        public ApplicationState AppStatus { get; private set; }
 
         /// <summary>
         /// Sesión asociada.
         /// </summary>
-        public IAppSession Session { get; private set; }
+        public AppSession Session { get; private set; }
 
         /// <summary>
         /// Crea una nueva instancia de <see cref="Application"/>
         /// </summary>
         /// <param name="session">Sesión inyectada por dependencia.</param>
-        /// <param name="notification">El tipo de notificación que utilizará.</param>
-        public Application(IAppSession session, INotification notification)
+        /// <param name="sender">El tipo de notificación que utilizará.</param>
+        public Application(AppSession session, IEmailSender sender)
         {
-            if(session != null)
-            {
-                Session = session;
-                Session.App = this;
-            }
-            else
-            {
-                throw new ArgumentNullException("IAppSession");
-            }
-
-            if(notification != null)
-            {
-                this.notification = notification;
-            }
-            else
-            {
-                throw new ArgumentNullException("INotification");
-            }
+            if (session == null)
+                throw new ArgumentNullException("AppSession");
+            if (sender == null)
+                throw new ArgumentNullException("IEmailSender");
+            Session = session;
+            Session.App = this;
+            this.sender = sender;
         }
 
         /// <summary>
@@ -78,8 +67,8 @@ namespace Core.Batch.Engine.Base
 
         /// <summary>
         /// Recupera la sesión que no ha completado correctamente y lanza la ejecución 
-        /// de las operaciones que han fallado <see cref="OperationStatus.Failed"/>
-        /// y las que aun no se han ejecutado <see cref="OperationStatus.NotExecuted"/>.
+        /// de las operaciones que han fallado <see cref="OperationState.Failed"/>
+        /// y las que aun no se han ejecutado <see cref="OperationState.NotExecuted"/>.
         /// </summary>
         public async Task ResumeAsync()
         {
@@ -95,7 +84,7 @@ namespace Core.Batch.Engine.Base
                 {
                     var operation = Session
                         .OperationsResult
-                        .Where(x => x.Status == OperationStatus.Failed)
+                        .Where(x => x.Status == OperationState.Failed)
                         .SingleOrDefault();
 
                     if (operation != null)
@@ -120,7 +109,7 @@ namespace Core.Batch.Engine.Base
                         System.Diagnostics.Debug.WriteLine(" No se encontrado la operación fallida.");
 #endif
                         Message = "No se encontrado la operación fallida.";
-                        AppStatus = ApplicationStatus.Retry;
+                        AppStatus = ApplicationState.Retry;
                     }
                 }
                 else
@@ -130,7 +119,7 @@ namespace Core.Batch.Engine.Base
                     System.Diagnostics.Debug.WriteLine("No se han encontrado operaciones para ejecutar.");
 #endif
                     Message = "No se han encontrado operaciones para ejecutar.";
-                    AppStatus = ApplicationStatus.Retry;
+                    AppStatus = ApplicationState.Retry;
                 }
             }
             else
@@ -140,7 +129,7 @@ namespace Core.Batch.Engine.Base
                 System.Diagnostics.Debug.WriteLine("Estás intentando recuperar una sesión que no existe.");
 #endif
                 Message = "Estás intentando recuperar una sesión que no existe.";
-                AppStatus = ApplicationStatus.Retry;
+                AppStatus = ApplicationState.Retry;
             }
         }
 
@@ -176,7 +165,7 @@ namespace Core.Batch.Engine.Base
         {
             if (response.IsSuccessStatusCode)
             {
-                operation.Status = OperationStatus.Ok;
+                operation.Status = OperationState.Ok;
                 await Session.StoreAsync(operation);
                 return 1;
             }
@@ -188,7 +177,7 @@ namespace Core.Batch.Engine.Base
                 }
                 else
                 {
-                    operation.Status = OperationStatus.Failed;
+                    operation.Status = OperationState.Failed;
                     await Session.StoreAsync(operation);
                     await CloseSessionAndNotify(SessionState.Uncompleted, NotificationType.Failed);
                     return -1;
@@ -197,7 +186,7 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Realiza los reintentos necesarios cuando el estado de la operación no es <see cref="OperationStatus.Ok"/>
+        /// Realiza los reintentos necesarios cuando el estado de la operación no es <see cref="OperationState.Ok"/>
         /// </summary>
         /// <param name="operation">La operación que se intentará ejecutar.</param>
         /// <returns>Verdadero si la operación se ejecuta correctamente, falso si no.</returns>
@@ -235,18 +224,27 @@ namespace Core.Batch.Engine.Base
         /// <param name="notificationType">Determina el tipo de notificación a enviar.</param>
         async Task CloseSessionAndNotify(SessionState sessionState, NotificationType notificationType)
         {
-            if(sessionState == SessionState.Uncompleted)
+            if (sessionState == SessionState.Uncompleted)
             {
-                AppStatus = ApplicationStatus.Retry;
+                AppStatus = ApplicationState.Retry;
             }
             else
             {
-                AppStatus = ApplicationStatus.Ok;
+                AppStatus = ApplicationState.Ok;
             }
 
             Session.State = sessionState;
             await Session.FlushAsync();
-            await notification.NotifyAsync(notificationType);
+
+            switch (notificationType)
+            {
+                case NotificationType.Ok:
+                    await sender.SendSuccessEmailAsync();
+                    break;
+                case NotificationType.Failed:
+                    await sender.SendErrorEmailAsync();
+                    break;
+            }
         }
 
         #region Dispose pattern

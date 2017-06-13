@@ -30,14 +30,14 @@ namespace Core.Batch.Engine.Base
         /// Busca una sesión persistida.
         /// </summary>
         /// <param name="predicate">Predicado para buscar la sesión determinada.</param>
-        /// <returns>Un objeto <see cref="IAppSession"/> en caso de encontrarlo. Nulo si no lo encuentra.</returns>
-        public async Task<IAppSession> FindAsync(Func<IAppSession,bool> predicate)
+        /// <returns>Un objeto <see cref="AppSession"/> en caso de encontrarlo. Nulo si no lo encuentra.</returns>
+        public async Task<AppSession> FindAsync(Func<AppSession,bool> predicate)
         {
             var rootPath = AppDomain.CurrentDomain.BaseDirectory;
             string fullPath = $"{rootPath}\\{fileName}";
             string json = string.Empty;
 
-            IAppSession session = null;
+            AppSession session = null;
             if (File.Exists(fullPath))
             {
                 StreamReader file = new StreamReader(fullPath);
@@ -73,10 +73,10 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Persiste un objecto <see cref="IAppSession"/>.
+        /// Persiste un objecto <see cref="AppSession"/>.
         /// </summary>
         /// <param name="session">Objeto a persistir.</param>
-        public async Task PersistAsync(IAppSession session)
+        public async Task PersistAsync(AppSession session)
         {
             string json = string.Empty;
             try
@@ -115,11 +115,11 @@ namespace Core.Batch.Engine.Base
         }
 
         /// <summary>
-        /// Elimina un elemento <see cref="IAppSession"/> previamente persistido.
+        /// Elimina un elemento <see cref="AppSession"/> previamente persistido.
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public Task<bool> RemoveAsync(IAppSession session)
+        public Task<bool> RemoveAsync(AppSession session)
         {
             throw new NotImplementedException();
         }

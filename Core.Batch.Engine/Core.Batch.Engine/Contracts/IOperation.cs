@@ -1,4 +1,5 @@
-﻿using Core.Batch.Engine.Helpers;
+﻿using Core.Batch.Engine.Base;
+using Core.Batch.Engine.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
@@ -23,11 +24,11 @@ namespace Core.Batch.Engine.Contracts
         /// Estado de la operación.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        OperationStatus Status { get; set; }
+        OperationState Status { get; set; }
 
         /// <summary>
-        /// Asociación bidireccional entre <see cref="IAppSession"/> y <see cref="IOperation"/>
+        /// Asociación bidireccional entre <see cref="AppSession"/> y <see cref="IOperation"/>
         /// </summary>
-        IAppSession Session { get; set; }
+        AppSession Session { get; set; }
     }
 }

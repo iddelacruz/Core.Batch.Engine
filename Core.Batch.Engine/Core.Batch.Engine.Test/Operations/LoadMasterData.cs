@@ -13,7 +13,7 @@ namespace Core.Batch.Engine.Test.Operations
         {
             return new OperationResponseMessage
             {
-                Status = Helpers.OperationStatus.Ok
+                Status = Helpers.OperationState.Ok
             };
         }
     }

@@ -1,5 +1,7 @@
 ﻿using Core.Batch.Engine.Contracts;
 using Core.Batch.Engine.Helpers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,7 @@ namespace Core.Batch.Engine.Base
     /// <summary>
     /// Clase que contendrá las operaciones a ejecutar.
     /// </summary>
-    public sealed class AppSession : IAppSession
+    public sealed class AppSession
     {
         #region Fields
         static IUnitOfWork _unitOfWork;
@@ -25,11 +27,13 @@ namespace Core.Batch.Engine.Base
         /// <summary>
         /// Listado de operaciones pendientes.
         /// </summary>
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Auto)]
         public Queue<IOperation> OperationsRemaining { get; internal set; }
 
         /// <summary>
         /// Lista con los resultados de las operaciones realizadas.
         /// </summary>
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Auto)]
         public List<IOperation> OperationsResult { get; internal set; }
 
         /// <summary>
@@ -45,12 +49,14 @@ namespace Core.Batch.Engine.Base
         /// <summary>
         /// Propiedad que determina almacena el estado de la sesión.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         public SessionState State { get; set; }
 
         /// <summary>
-        /// Asociación bidireccional entre <see cref="IAppSession"/> y <see cref="IApplication"/>
+        /// Asociación bidireccional entre <see cref="AppSession"/> y <see cref="Application"/>
         /// </summary>
-        public IApplication App { get; set; }
+        [JsonIgnore]
+        public Application App { get; set; }
         #endregion
 
         #region Constructors
@@ -76,7 +82,7 @@ namespace Core.Batch.Engine.Base
 
         #region Operations
         /// <summary>
-        /// Obtiene un objeto <see cref="IAppSession"/> por su identificador.
+        /// Obtiene un objeto <see cref="AppSession"/> por su identificador.
         /// </summary>
         /// <param name="identifier">Session identifier.</param>
         public async Task GetAsync(Guid identifier)
@@ -158,7 +164,7 @@ namespace Core.Batch.Engine.Base
         /// El estado de la sesión debe ser: <see cref="SessionState.Uncompleted"/>
         /// </summary>
         /// <returns>The session recovered.</returns>
-        public static async Task<IAppSession> RecoverAsync()
+        public static async Task<AppSession> RecoverAsync()
         {
             return await _unitOfWork.FindAsync(x => x.State == SessionState.Uncompleted);
         }

@@ -1,16 +1,14 @@
 ﻿using Core.Batch.Engine.Contracts;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections;
+using Core.Batch.Engine.Base;
 
 namespace Core.Batch.Engine.Helpers
 {
-    public sealed class StorageCollection : ICollection<IAppSession>
+    public sealed class StorageCollection : ICollection<AppSession>
     {
-        IList<IAppSession> _helperList = new List<IAppSession>();
+        IList<AppSession> _helperList = new List<AppSession>();
 
         public int Count
         {
@@ -28,7 +26,7 @@ namespace Core.Batch.Engine.Helpers
             }
         }
 
-        public void Add(IAppSession item)
+        public void Add(AppSession item)
         {
             if (_helperList.Contains(item))
             {
@@ -52,22 +50,22 @@ namespace Core.Batch.Engine.Helpers
             _helperList.Clear();
         }
 
-        public bool Contains(IAppSession item)
+        public bool Contains(AppSession item)
         {
             return _helperList.Contains(item);
         }
 
-        public void CopyTo(IAppSession[] array, int arrayIndex)
+        public void CopyTo(AppSession[] array, int arrayIndex)
         {
             _helperList.CopyTo(array, arrayIndex);
         }
 
-        public IEnumerator<IAppSession> GetEnumerator()
+        public IEnumerator<AppSession> GetEnumerator()
         {
             return _helperList.GetEnumerator();
         }
 
-        public bool Remove(IAppSession item)
+        public bool Remove(AppSession item)
         {
             return _helperList.Remove(item);
         }

@@ -10,7 +10,7 @@ namespace Core.Batch.Engine.Base
         /// <summary>
         /// El estado de la operación.
         /// </summary>
-        public OperationStatus Status { get; set; }
+        public OperationState Status { get; set; }
 
         /// <summary>
         /// Propiedad autocalculada que retorna el estado de la operación.
@@ -19,7 +19,7 @@ namespace Core.Batch.Engine.Base
         {
             get
             {
-                if(Status == OperationStatus.Ok)
+                if(Status == OperationState.Ok)
                 {
                     return true;
                 }

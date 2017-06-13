@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Batch.Engine.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,19 +13,19 @@ namespace Core.Batch.Engine.Contracts
         /// Busca una sesión persistida.
         /// </summary>
         /// <param name="predicate">Predicado para buscar la sesión determinada.</param>
-        /// <returns>Un objeto <see cref="IAppSession"/> en caso de encontrarlo. Nulo si no lo encuentra.</returns>
-        Task<IAppSession> FindAsync(Func<IAppSession, bool> predicate);
+        /// <returns>Un objeto <see cref="AppSession"/> en caso de encontrarlo. Nulo si no lo encuentra.</returns>
+        Task<AppSession> FindAsync(Func<AppSession, bool> predicate);
 
         /// <summary>
-        /// Persiste un objecto <see cref="IAppSession"/>.
+        /// Persiste un objecto <see cref="AppSession"/>.
         /// </summary>
         /// <param name="session">Objeto a persistir.</param>
-        Task PersistAsync(IAppSession session);
+        Task PersistAsync(AppSession session);
 
         /// <summary>
-        /// Elimina un elemento <see cref="IAppSession"/> previamente persistido.
+        /// Elimina un elemento <see cref="AppSession"/> previamente persistido.
         /// </summary>
         /// <param name="session"></param>
-        Task<bool> RemoveAsync(IAppSession session);
+        Task<bool> RemoveAsync(AppSession session);
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Batch.Engine.Helpers
+namespace Core.Batch.Engine.ConfigSection
 {
     public sealed class EngineConfigSection
     {

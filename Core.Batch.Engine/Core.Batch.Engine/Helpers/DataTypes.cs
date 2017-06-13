@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.Batch.Engine.Helpers
+﻿namespace Core.Batch.Engine.Helpers
 {
     /// <summary>
     /// Tipo de notificación a enviar.
@@ -12,14 +6,13 @@ namespace Core.Batch.Engine.Helpers
     public enum NotificationType : byte
     {
         Ok,
-        Failed,
-        Error
+        Failed
     }
 
     /// <summary>
     /// Estado de la operación.
     /// </summary>
-    public enum OperationStatus : byte
+    public enum OperationState : byte
     {
         NotExecuted,
         InProgress,
@@ -41,7 +34,7 @@ namespace Core.Batch.Engine.Helpers
     /// <summary>
     /// Estado de la Aplicación
     /// </summary>
-    public enum ApplicationStatus :byte
+    public enum ApplicationState :byte
     {
         Ok,
         Retry,

@@ -18,12 +18,12 @@ namespace Core.Batch.Engine.Base
         /// <summary>
         /// Estado de la operación.
         /// </summary>
-        public OperationStatus Status { get; set; } = OperationStatus.NotExecuted;
+        public OperationState Status { get; set; } = OperationState.NotExecuted;
 
         /// <summary>
-        /// Asociación bidireccional entre <see cref="IOperation"/> e <see cref="IAppSession"/>
+        /// Asociación bidireccional entre <see cref="IOperation"/> e <see cref="AppSession"/>
         /// </summary>
-        public IAppSession Session { get; set; }
+        public AppSession Session { get; set; }
 
         /// <summary>
         /// Crea una nueva instancia de <see cref="Operation"/>
